@@ -45,7 +45,7 @@ def generate_game():
     current_stamp = INITIAL_STAMP
     for i in range(TIMESTAMPS_COUNT):
         current_stamp = generate_stamp(current_stamp)
-        stamps.append( current_stamp)   #здесь можно было сделать привязку к i : current_stamp , тогда в get_score  можно было сократить время до O-большое(времени выполнения)==(1), но как я писал вверху по заданию исходный код менять было нельзя.
+        stamps.append( current_stamp)
 
     return stamps
 
@@ -53,23 +53,22 @@ def generate_game():
 game_stamps = generate_game()
 
 def get_score(game_stamps, offset):
+    a = 'Данного оффсета не найдено'
+    if type(game_stamps)!=list or len(game_stamps)!=50001 :
+        a = 'Первым аргументом должен быть список, длинной 50001 значений'
+        return a
+    if type(game_stamps[1])!=dict :
+        a = 'Список должен состоять из словарей'
+        return a
+    if 'offset' not in game_stamps[50000] or 'score' not in game_stamps[50000] :
+        a = 'Список не содержит оффсета и/или счета'
+        return a
+    if type(offset) != int or offset<0 or offset>150000 :
+        a = 'Оффсет должен быть числом от 0 до 150000 '
+        return a
     for i in game_stamps :
-        if offset == i :
+        if offset == i['offset'] :
             home=i['score']['home']
             away=i['score']['away']
-    return home, away
-
-class Test(unittest.TestCase) :
-    
-    def test_get_score(self) :
-        for _ in range(10000):
-            offset =random.choice(game_stamps)
-            a=get_score(game_stamps,offset)
-
-            assert len(game_stamps)==50001
-            self.assertEqual(len(a),2) #разницы между обычным ассертом и юниттестом особо не вижу,в unittest есть удобные функции,но тут их вроде нет смысла использовать
-
-if __name__ == '__main__' :
-    unittest.main()
-
-
+            break
+    return {'home' : home,'away' :away} if a == 'Данного оффсета не найдено' else a
